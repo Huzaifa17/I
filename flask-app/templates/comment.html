@@ -1,0 +1,37 @@
+<div class="card mb-3 {% if comment.parent_comment_id %}ms-5{% endif %}">
+    <div class="card-body">
+        <strong>{{ comment.username }}</strong>
+        <p class="card-text" style="color: black;">{{ comment.comment | make_links_clickable | safe }}</p>
+
+        <!-- Display comment attachments -->
+        {% if comment.attachment_urls %}
+            <div class="attachments mt-2">
+                <strong>Attachments:</strong>
+                <ul class="list-unstyled">
+                    {% for url in comment.attachment_urls %}
+                        <li><a href="{{ url }}" target="_blank" class="text-decoration-none">{{ url.split('/')[-1] }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <!-- Reply form -->
+        <form action="{{ url_for('add_comment', post_id=post._id) }}" method="POST" enctype="multipart/form-data" class="mt-3">
+            <textarea name="comment" class="form-control mb-2" placeholder="Write a reply..." required></textarea>
+            <input type="hidden" name="parent_comment_id" value="{{ comment._id }}">
+            <input type="file" name="attachments" class="form-control mb-2" multiple>
+            <button type="submit" class="btn btn-secondary btn-sm">Reply</button>
+        </form>
+
+        <!-- Display replies recursively -->
+        {% if comment.replies %}
+            <div class="replies mt-3">
+                {% for reply in comment.replies %}
+                    {% with comment=reply %}
+                        {% include 'comment.html' %}
+                    {% endwith %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>

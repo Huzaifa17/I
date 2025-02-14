@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ user.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h3 class="card-title">{{ user.username }}</h3>
+        <p>Email: {{ user.email }}</p>
+        <p>Total Contribution: {{ total_contribution }}</p>
+        <p>Total Upvotes: {{ total_upvotes }}</p>
+        <p>Total Downvotes: {{ total_downvotes }}</p>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-body">
+        <h3 class="card-title">Posts by {{ user.username }}</h3>
+        {% for post in posts %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h4><a href="{{ url_for('view_topic', post_id=post._id) }}" class="text-decoration-none">{{ post.title }}</a></h4>
+                    <p>{{ post.content | make_links_clickable | safe }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
