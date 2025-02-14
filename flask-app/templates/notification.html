@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Notifications</h2>
+    <div class="list-group">
+        {% for notification in notifications %}
+        <a href="{{ notification.link }}" 
+           class="list-group-item list-group-item-action 
+                  {% if notification.type == 'moderator' %}list-group-item-primary
+                  {% elif notification.type == 'post_approved' %}list-group-item-success
+                  {% elif notification.type == 'post_deleted' %}list-group-item-danger
+                  {% endif %}">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    {{ notification.message }}
+                    <span class="badge bg-secondary ms-2">
+                        {{ notification.type|replace('_', ' ')|title }}
+                    </span>
+                </div>
+                <small class="text-muted">
+                    {{ notification.timestamp|datetimeformat('%b %d, %Y %I:%M %p') }}
+                </small>
+            </div>
+        </a>
+        {% else %}
+        <div class="list-group-item">
+            <div class="text-center text-muted py-3">
+                No notifications yet - everything's quiet! 🤫
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
