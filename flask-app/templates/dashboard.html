@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Programming Community{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Dashboard</h1>
+
+    <!-- Analytics Section -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">📈 Post Analytics</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item">Approved: {{ post_stats.approved }}</li>
+                        <li class="list-group-item">Pending: {{ post_stats.pending }}</li>
+                        <li class="list-group-item">Rejected: {{ post_stats.rejected }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">👤 User Activity</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item">Comments: {{ user_activity.comments }}</li>
+                        <li class="list-group-item">Upvotes: {{ user_activity.upvotes }}</li>
+                        <li class="list-group-item">Downvotes: {{ user_activity.downvotes }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Topics Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title">📚 Approved Topics</h5>
+            <ul class="list-group">
+                {% for topic in approved_topics %}
+                    <li class="list-group-item">
+                        <a href="{{ url_for('view_topic', post_id=topic._id) }}">{{ topic.title }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Profiles Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title">👥 User Profiles</h5>
+            <ul class="list-group">
+                {% for user in all_users %}
+                    <li class="list-group-item">
+                        <a href="{{ url_for('profile', username=user.username) }}">
+                            {{ user.username }}
+                            {% if user.role == 'admin' %}
+                                <span class="badge bg-danger">Admin</span>
+                            {% elif user.role == 'moderator' %}
+                                <span class="badge bg-primary">Moderator</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Admin Section: Assign Moderator -->
+    {% if is_admin() %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title">🔧 Admin Tools</h5>
+                <form action="{{ url_for('dashboard_assign_moderator') }}" method="POST">
+                    <div class="input-group">
+                        <select name="username" class="form-select" required>
+                            {% for user in all_users %}
+                                <option value="{{ user.username }}">{{ user.username }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-primary" type="submit">Assign Moderator</button>
+                    </div>
+                </form>
+        </div>
+    </div>
+    {% endif %}
+
+
+    <!-- Moderator Section: Approve/Reject Posts -->
+    <!-- {% if is_moderator() %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title">🛠️ Moderator Tools</h5>
+            <form action="{{ url_for('bulk_actions') }}" method="POST">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Select</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in pending_posts %}
+                        <tr>
+                            <td><input type="checkbox" name="post_ids" value="{{ post._id }}"></td>
+                            <td>{{ post.title }}</td>
+                            <td>{{ post.username }}</td>
+                            <td>{{ post.status }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button class="btn btn-success" type="submit" name="action" value="approve">Approve Selected</button>
+                <button class="btn btn-danger" type="submit" name="action" value="reject">Reject Selected</button>
+            </form>
+        </div>
+    </div>
+    {% endif %} -->
+
+    <!-- Moderator Section: Approve/Reject Posts -->
+    {% if is_moderator() %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title">🛠️ Moderator Tools</h5>
+            <form action="{{ url_for('bulk_actions') }}" method="POST">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Select</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in pending_posts %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="post_ids" value="{{ post._id }}">
+                            </td>
+                            <td>
+                                <!-- Clickable Title -->
+                                <a href="{{ url_for('view_topic', post_id=post._id) }}" class="text-decoration-none">
+                                    {{ post.title }}
+                                </a>
+                            </td>
+                            <td>
+                                <!-- Clickable Author Name -->
+                                <a href="{{ url_for('profile', username=post.username) }}" class="text-decoration-none">
+                                    {{ post.username }}
+                                </a>
+                            </td>
+                            <td>{{ post.status }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button class="btn btn-success" type="submit" name="action" value="approve">Approve Selected</button>
+                <button class="btn btn-danger" type="submit" name="action" value="reject">Reject Selected</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+
+
+
+
+
+{% endblock %}

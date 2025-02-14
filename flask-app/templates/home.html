@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Welcome {{ session['username'] }}</h2>
+
+<form method="POST" action="{{ url_for('search') }}">
+    <input type="text" name="query" placeholder="Search..." required>
+    <select name="search_type">
+        <option value="topic">Topic</option>
+        <option value="email">Email</option>
+    </select>
+    <button type="submit">Search</button>
+</form>
+
+<h3>Posts</h3>
+<ul>
+    {% for post in posts %}
+    <li>
+        <a href="{{ url_for('view_topic', post_id=post._id) }}">{{ post.title }}</a>
+        <p>{{ make_links_clickable(post.content) | safe }}</p>
+        {% if post.attachment_urls %}
+        <h4>Attachments:</h4>
+        <ul>
+            {% for attachment_url in post.attachment_urls %}
+            <li><a href="{{ attachment_url }}" target="_blank">View Attachment</a></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <p>Contribution: {{ (post.upvotes | default(0)) - (post.downvotes | default(0)) }}</p>
+        <p>Upvotes: {{ post.upvotes | default(0) }} | Downvotes: {{ post.downvotes | default(0) }}</p>
+    </li>
+    {% endfor %}
+</ul>
+
+<a href="{{ url_for('create_post') }}">Create New Post</a>
+{% endblock %}
